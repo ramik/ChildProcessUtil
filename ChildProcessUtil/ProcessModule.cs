@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Nancy;
 
 namespace ChildProcessUtil
@@ -12,7 +13,7 @@ namespace ChildProcessUtil
 
         public ProcessModule() : base("/process")
         {
-            Get["/list"] = _ => ActiveProcesses;
+            Get["/list"] = _ => ActiveProcesses.OrderBy(x => x);
             Post["/{process:int}"] = parameters =>
             {
                 ActiveProcesses.Add(parameters.process);
@@ -25,6 +26,6 @@ namespace ChildProcessUtil
             };
         }
 
-        public static List<int> ActiveProcesses { get; private set; }
+        public static List<int> ActiveProcesses { get; set; }
     }
 }

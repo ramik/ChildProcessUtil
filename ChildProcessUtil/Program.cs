@@ -1,25 +1,35 @@
 ﻿using System;
+using System.Collections.Generic;
 using Nancy;
 using Nancy.Hosting.Self;
 
 namespace ChildProcessUtil
 {
-    internal class Program
+    public class Program
     {
-        const string HttpAddress = "http://localhost:30197";
-      
+        private const string HttpAddress = "http://localhost:";
+        private static NancyHost host;
         private static void Main(string[] args)
+        {
+            StartServer(30197);
+        }
+
+        public static void StartServer(int port)
         {
             var hostConfigs = new HostConfiguration
             {
                 UrlReservations = new UrlReservations {CreateAutomatically = true}
             };
 
-            using (var host = new NancyHost(new Uri(HttpAddress), new DefaultNancyBootstrapper(), hostConfigs))
-            {
-                host.Start();
-                Console.ReadLine();
-            }
+            var uriString = HttpAddress + port;
+            ProcessModule.ActiveProcesses = new List<int>();
+            host = new NancyHost(new Uri(uriString), new DefaultNancyBootstrapper(), hostConfigs);
+            host.Start();
+        }
+
+        public static void StopServer(int port)
+        {
+            host.Stop();
         }
     }
 }
