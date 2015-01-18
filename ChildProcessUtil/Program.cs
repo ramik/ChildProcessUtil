@@ -1,15 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Nancy;
+using Nancy.Hosting.Self;
 
 namespace ChildProcessUtil
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        const string HttpAddress = "http://localhost:30197";
+      
+        private static void Main(string[] args)
         {
+            var hostConfigs = new HostConfiguration
+            {
+                UrlReservations = new UrlReservations {CreateAutomatically = true}
+            };
+
+            using (var host = new NancyHost(new Uri(HttpAddress), new DefaultNancyBootstrapper(), hostConfigs))
+            {
+                host.Start();
+                Console.ReadLine();
+            }
         }
     }
 }
