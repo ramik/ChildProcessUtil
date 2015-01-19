@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Nancy;
 using Nancy.Hosting.Self;
 
@@ -11,12 +12,10 @@ namespace ChildProcessUtil
         private static NancyHost host;
         private static void Main(string[] args)
         {
-            StartServer(30197);
-            new MainProcessWatcher(int.Parse(args[0]));
-            Console.Read();
+            StartServer(30197, int.Parse(args[0]));
         }
 
-        public static void StartServer(int port)
+        public static void StartServer(int port, int mainProcessId)
         {
             var hostConfigs = new HostConfiguration
             {
@@ -27,9 +26,11 @@ namespace ChildProcessUtil
             ProcessModule.ActiveProcesses = new List<int>();
             host = new NancyHost(new Uri(uriString), new DefaultNancyBootstrapper(), hostConfigs);
             host.Start();
+            new MainProcessWatcher(mainProcessId);
+            Thread.Sleep(Timeout.Infinite);
         }
 
-        public static void StopServer(int port)
+        internal static void StopServer(int port)
         {
             host.Stop();
         }
