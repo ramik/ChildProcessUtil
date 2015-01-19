@@ -11,7 +11,7 @@ namespace ChildProcessUtil
         internal MainProcessWatcher(int processId)
         {
             ProcessId = processId;
-            Ticker = new Timer(TimerMethod, this, 1000, 1000);
+            Ticker = new Timer(TimerMethod, this, 1000, 4000);
         }
 
         internal MainProcessWatcher(int processId, Timer timer)

@@ -12,7 +12,7 @@ namespace ChildProcessUtil
         private static void Main(string[] args)
         {
             StartServer(30197);
-            new MainProcessWatcher(7580);
+            new MainProcessWatcher(int.Parse(args[0]));
             Console.Read();
         }
 
