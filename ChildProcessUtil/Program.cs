@@ -12,6 +12,7 @@ namespace ChildProcessUtil
         private static NancyHost host;
         private static void Main(string[] args)
         {
+            Console.WriteLine("Child process watcher and automatic killer");
             if (args.Length != 2)
             {
                 Console.WriteLine("usage: ChildProcessUtil.exe serverPort mainProcessId");
