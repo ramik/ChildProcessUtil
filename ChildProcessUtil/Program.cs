@@ -12,7 +12,12 @@ namespace ChildProcessUtil
         private static NancyHost host;
         private static void Main(string[] args)
         {
-            StartServer(30197, int.Parse(args[0]));
+            if (args.Length != 2)
+            {
+                Console.WriteLine("usage: ChildProcessUtil.exe serverPort mainProcessId");
+                return;
+            }
+            StartServer(int.Parse(args[0]), int.Parse(args[1]));
         }
 
         public static void StartServer(int port, int mainProcessId)
