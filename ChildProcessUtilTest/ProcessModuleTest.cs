@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 using ChildProcessUtil;
 using NUnit.Framework;
 
@@ -10,7 +11,7 @@ namespace ChildProcessUtilTest
         [SetUp]
         public void Init()
         {
-            Program.StartServer(40001);
+            Task.Factory.StartNew(() => Program.StartServer(40001, 0));
         }
 
         [TearDown]
@@ -71,7 +72,7 @@ namespace ChildProcessUtilTest
 
         private static string ReadResultFromRequest(HttpWebRequest request)
         {
-            using (var response = (HttpWebResponse)request.GetResponse())
+            using (var response = (HttpWebResponse) request.GetResponse())
             using (var dataStream = response.GetResponseStream())
             using (var reader = new StreamReader(dataStream))
             {
