@@ -2,19 +2,17 @@
 <package >
   <metadata>
     <id>ChildProcessUtil</id>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <authors>Rami Karjalainen</authors>
     <owners>ramik</owners>
     <licenseUrl>https://github.com/ramik/ChildProcessUtil/blob/master/LICENSE</licenseUrl>
     <projectUrl>http://github.com/ramik/ChildProcessUtil</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Utility to watch processes, when main process exits kills child processes. Offers REST Api for child process management</description>
-    <releaseNotes>StartServer signature change</releaseNotes>
+    <description>Utility to watch processes, when main process exits kills child processes. Uses named piper for interprocess communication.</description>
+    <releaseNotes>Nancy and REST ==> named pipes</releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>Process management</tags>
     <dependencies>
-      <dependency id="Nancy" version="0.23.2" />
-      <dependency id="Nancy.Hosting.Self" version="0.23.2" />
     </dependencies>
   </metadata>
 </package>
