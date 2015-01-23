@@ -1,19 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using ChildProcessUtil;
 using NUnit.Framework;
-using ProcessModule = ChildProcessUtil.ProcessModule;
 
 namespace ChildProcessUtilTest
 {
     public class MainProcessWatcherTest
     {
+        private const string Testpipe = "TestPipe";
+        private const string Testpipe2 = "TestPipe2";
         private Process mainProcess;
 
         [SetUp]
         public void Init()
         {
+            Task.Factory.StartNew(() => Program.StartAddPipe(Testpipe));
+            Task.Factory.StartNew(() => Program.StartDeletePipe(Testpipe2));
             mainProcess = StartNotepadProcess();
         }
 
@@ -29,7 +32,8 @@ namespace ChildProcessUtilTest
         {
             var process1 = StartNotepadProcess();
             var process2 = StartNotepadProcess();
-            ProcessModule.ActiveProcesses = new List<int> {process1.Id, process2.Id};
+            ProcessModuleTest.AddProcess(process1.Id);
+            ProcessModuleTest.AddProcess(process2.Id);
             var watch = new MainProcessWatcher(mainProcess.Id, null);
             Assert.IsFalse(process1.HasExited);
             Assert.IsFalse(process1.HasExited);
@@ -37,6 +41,8 @@ namespace ChildProcessUtilTest
             MainProcessWatcher.HandleMainprocessStatus(watch);
             Assert.IsTrue(process1.HasExited);
             Assert.IsTrue(process1.HasExited);
+            ProcessModuleTest.DeleteProcess(process1.Id);
+            ProcessModuleTest.DeleteProcess(process2.Id);
         }
 
         private static Process StartNotepadProcess()

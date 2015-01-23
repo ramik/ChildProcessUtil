@@ -1,31 +1,27 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Nancy;
 
 namespace ChildProcessUtil
 {
-    public class ProcessModule : NancyModule
+    public class ProcessModule
     {
         static ProcessModule()
         {
             ActiveProcesses = new List<int>();
         }
 
-        public ProcessModule() : base("/process")
+        public static List<int> ActiveProcesses { get; set; }
+
+        public static string AddProcess(int process)
         {
-            Get["/list"] = _ => ActiveProcesses.OrderBy(x => x);
-            Post["/{process:int}"] = parameters =>
-            {
-                ActiveProcesses.Add(parameters.process);
-                return "ok";
-            };
-            Delete["/{process:int}"] = parameters =>
-            {
-                ActiveProcesses.RemoveAll(x => x == parameters.process);
-                return "ok";
-            };
+            ActiveProcesses.Add(process);
+            return string.Join(",", ActiveProcesses.OrderBy(x => x));
         }
 
-        public static List<int> ActiveProcesses { get; set; }
+        public static string DeletePRocess(int process)
+        {
+            ActiveProcesses.RemoveAll(x => x == process);
+            return string.Join(",", ActiveProcesses.OrderBy(x => x));
+        }
     }
 }

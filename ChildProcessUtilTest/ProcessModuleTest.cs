@@ -1,5 +1,6 @@
-﻿using System.IO;
-using System.Net;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.IO.Pipes;
 using System.Threading.Tasks;
 using ChildProcessUtil;
 using NUnit.Framework;
@@ -8,75 +9,57 @@ namespace ChildProcessUtilTest
 {
     public class ProcessModuleTest
     {
+        private const string Testpipe = "TestPipe";
+        private const string Testpipe2 = "TestPipe2";
+
         [SetUp]
         public void Init()
         {
-            Task.Factory.StartNew(() => Program.StartServer(40001, 0));
-        }
-
-        [TearDown]
-        public void CleanUp()
-        {
-            Program.StopServer(40001);
-        }
-
-        [TestCase]
-        public void WhenProcessArrayIsEmpty()
-        {
-            Assert.AreEqual("[]", GetProcessList());
+            // ProcessModule.ActiveProcesses = new List<int>();
+            Task.Factory.StartNew(() => Program.StartAddPipe(Testpipe));
+            Task.Factory.StartNew(() => Program.StartDeletePipe(Testpipe2));
         }
 
         [TestCase]
         public void DeleteFromProcessesRemovesFromProcessList()
         {
-            Assert.AreEqual("ok", AddProcess(1));
-            Assert.AreEqual("ok", AddProcess(2));
-            Assert.AreEqual("ok", DeleteProcess(2));
-            Assert.AreEqual("[1]", GetProcessList());
+            Assert.AreEqual("1", AddProcess(1));
+            Assert.AreEqual("1,2", AddProcess(2));
+            Assert.AreEqual("1", DeleteProcess(2));
+            Assert.AreEqual("", DeleteProcess(1));
         }
 
         [TestCase]
-        public void PostToProcessesGetsAddsToProcessList()
+        public void AddToProcessesInsertsToProcessList()
         {
-            Assert.AreEqual("ok", AddProcess(1));
-            Assert.AreEqual("ok", AddProcess(2));
-            Assert.AreEqual("[1,2]", GetProcessList());
+            Assert.AreEqual("1", AddProcess(1));
+            Assert.AreEqual("1,2", AddProcess(2));
+            Assert.AreEqual("2", DeleteProcess(1));
+            Assert.AreEqual("", DeleteProcess(2));
         }
 
-        private static string GetProcessList()
+        internal static string AddProcess(int processId)
         {
-            var request = (HttpWebRequest) WebRequest.Create(@"http://localhost:40001/process/list");
-            request.Method = "GET";
-            request.Accept = "*/*";
-
-            return ReadResultFromRequest(request);
+            return SendReceiveProcessToWatcher(processId, Testpipe);
         }
 
-        private static string AddProcess(int processId)
+        internal static string DeleteProcess(int processId)
         {
-            var request = (HttpWebRequest) WebRequest.Create(@"http://localhost:40001/process/" + processId);
-            request.Method = "POST";
-            request.Accept = "*/*";
-            request.ContentLength = 0;
-            return ReadResultFromRequest(request);
+            return SendReceiveProcessToWatcher(processId, Testpipe2);
         }
 
-        private static string DeleteProcess(int processId)
+        private static string SendReceiveProcessToWatcher(int processId, string pipe)
         {
-            var request = (HttpWebRequest) WebRequest.Create(@"http://localhost:40001/process/" + processId);
-            request.Method = "DELETE";
-            request.Accept = "*/*";
-            request.ContentLength = 0;
-            return ReadResultFromRequest(request);
-        }
-
-        private static string ReadResultFromRequest(HttpWebRequest request)
-        {
-            using (var response = (HttpWebResponse) request.GetResponse())
-            using (var dataStream = response.GetResponseStream())
-            using (var reader = new StreamReader(dataStream))
+            using (var add = new NamedPipeClientStream(pipe))
             {
-                return reader.ReadToEnd();
+                add.Connect();
+                using (var streamReader = new StreamReader(add))
+                using (var writer = new StreamWriter(add))
+                {
+                    writer.WriteLine(processId.ToString());
+                    writer.Flush();
+                    return streamReader.ReadLine();
+                }
             }
         }
     }
