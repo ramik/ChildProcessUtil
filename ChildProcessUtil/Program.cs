@@ -10,10 +10,9 @@ namespace ChildProcessUtil
     {
         private static void Main(string[] args)
         {
-            StartAddPipe(args[1]);
-            StartDeletePipe(args[2]);
-            Task.Delay(1000).Wait();
             new MainProcessWatcher(int.Parse(args[0]));
+            StartAddPipe(args[1]);
+            StartDeletePipe(args[2]);    
             Task.Delay(Timeout.Infinite).Wait();
         }
 
