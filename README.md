@@ -1,13 +1,9 @@
 ChildProcessUtil
 ================
 
- 
-
 This package is used to control, how child processes are closed when parent
 process is killed. This is in production use (quite many installs within WPF
 application).
-
- 
 
 How it works
 ------------
@@ -17,14 +13,10 @@ main process is still alive. When main process starts a child process, it
 registers it's process ID to the this utility. If main process is killed, the
 utility signals kill() to children and the terminates itself.
 
- 
-
 Interprocess communication
 --------------------------
 
 This utility uses named pipes to pass information between processes.
-
- 
 
 Why?
 ----
@@ -34,14 +26,10 @@ This is needed in our case, because child processes are doing long lasting
 no longer needed. In windows, there is no way to tell (at least I'm not aware)
 that when parent exists -- childs must exit, too.
 
- 
-
 Usage
 -----
 
 In our project, we have bundled the utility (exe).
-
- 
 
 ### Starting the application 
 
@@ -108,6 +96,13 @@ internal static string AddProcess(int processId)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  
+
+>   Now when starting the process, call:  
+>   var result = ProcessWatcherConnection.AddProcess(Process.Id);  
+>   
+
+>   After process completes, call:  
+>   var result = ProcessWatcherConnection.DeleteProcess(Process.Id);
 
  
 
